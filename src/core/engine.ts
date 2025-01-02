@@ -1,5 +1,5 @@
 import { CHAIN_DATA } from "@wallet/constants";
-import { CrossChainContext, PaymentConfig, SetWhileListTokenParams } from "../types";
+import { PaymentContext, PaymentConfig, SetWhiteListTokenParams, IsWhiteListTokenParams } from "../types";
 import { CoreChain } from "./coreChain";
 
 export class Coin98Payment {
@@ -11,14 +11,14 @@ export class Coin98Payment {
         this.privateKey = config.privateKey
     }
 
-    async setWhileListToken(params: SetWhileListTokenParams): Promise<string>{
-        const { params: paramsWhileList, chain } = params
+    async setWhitelistToken(params: SetWhiteListTokenParams): Promise<string>{
+        const { params: paramsWhiteList, chain } = params
 
         try {
-            const addresses = paramsWhileList.map(item => item.address)
-            const isActives = paramsWhileList.map(item => item.isActive)
+            const addresses = paramsWhiteList.map(item => item.address)
+            const isActives = paramsWhiteList.map(item => item.isActive)
 
-            const { contract, address }: { address: string; contract: CrossChainContext } = this.coreChain.getContract(chain)
+            const { contract, address }: { address: string; contract: PaymentContext } = this.coreChain.getContract(chain)
             const data = contract.methods.setWhitelistTokens(addresses, isActives).encodeABI()
 
             const chainData = CHAIN_DATA[chain]
@@ -51,4 +51,15 @@ export class Coin98Payment {
         }
     }
 
+    async isWhitelistToken(params: IsWhiteListTokenParams): Promise<boolean> {
+        const {tokenAddress, chain} = params
+        try {
+            const { contract }: { address: string; contract: PaymentContext } = this.coreChain.getContract(chain)
+            const isWhiteList = await contract.methods.isWhiteListToken(tokenAddress).call()
+
+            return isWhiteList as boolean
+        } catch (error) {
+            return false
+        }
+    }
 }

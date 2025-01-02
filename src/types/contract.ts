@@ -1,17 +1,18 @@
 import { Web3ContractContext } from 'ethereum-abi-types-generator'
 
-export type CrossChainMethods = 'setWhitelistTokens'
+export type PaymentMethods = 'setWhitelistTokens' | 'isWhiteListToken'
 
-export type CrossChainContext = Web3ContractContext<CrossChainContract, CrossChainMethods, null, null>
+export type PaymentContext = Web3ContractContext<PaymentContract, PaymentMethods, null, null>
 
 export interface EncodeContext {
     encodeABI(): string
 }
 
 export interface CallContext {
-    call(): Promise<string>
+    call(): Promise<string | boolean>
 }
 
-export interface CrossChainContract {
+export interface PaymentContract {
     setWhitelistTokens(tokens: string[], isActives: boolean[]): EncodeContext
+    isWhiteListToken(contractAddress: string): CallContext
 }

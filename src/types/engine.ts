@@ -9,10 +9,15 @@ export interface PaymentConfig {
   privateKey: string;
 }
 
-export interface SetWhileListTokenParams {
+export interface SetWhiteListTokenParams {
   params: Array<{
     address: string;
     isActive: boolean;
   }>;
+  chain: chainKey
+}
+
+export interface IsWhiteListTokenParams {
+  tokenAddress: string
   chain: chainKey
 }

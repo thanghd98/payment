@@ -1,6 +1,6 @@
 import Web3 from "web3"
 import { CHAIN_DATA } from '@wallet/constants'
-import { chainKey, CrossChainContext } from "../types"
+import { chainKey, PaymentContext } from "../types"
 import { PaymentAbi, paymentContract } from "../constants"
 import { AbiItem } from "ethereum-abi-types-generator"
 
@@ -19,7 +19,7 @@ export class CoreChain {
         const contract = (new client.eth.Contract(
             PaymentAbi as AbiItem[],
             contractAddress
-        ) as unknown) as CrossChainContext
+        ) as unknown) as PaymentContext
 
         
         return { address: contractAddress, contract }
