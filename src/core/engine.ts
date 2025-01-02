@@ -1,5 +1,5 @@
 import { CHAIN_DATA } from "@wallet/constants";
-import { PaymentContext, PaymentConfig, SetWhiteListTokenParams, IsWhiteListTokenParams } from "../types";
+import { PaymentContext, PaymentConfig, SetWhiteListTokenParams, IsWhiteListTokenParams, PayParams } from "../types";
 import { CoreChain } from "./coreChain";
 
 export class Coin98Payment {
@@ -60,6 +60,41 @@ export class Coin98Payment {
             return isWhiteList as boolean
         } catch (error) {
             return false
+        }
+    }
+
+    async pay(params: PayParams): Promise<string>{
+        const { tokenAddress, amount, receiver, data: dataHex, chain } = params
+        try {
+            const { contract, address }: { address: string; contract: PaymentContext } = this.coreChain.getContract(chain)
+            const data = contract.methods.pay(tokenAddress, amount, receiver, dataHex).encodeABI()
+
+            const chainData = CHAIN_DATA[chain]
+
+            const client = this.coreChain.getProvider(chain)
+            const signer = client.eth.accounts.privateKeyToAccount(this.privateKey)
+            const nonce = await client.eth.getTransactionCount(signer.address)
+
+            const transaction = {
+                chainId: chainData?.numChainId,
+                to: address,
+                from: signer.address,
+                value: "0x",
+                data,
+                nonce
+            }
+
+            const gas = await client.eth.estimateGas(transaction)
+            //@ts-expect-error
+            transaction.gas = gas
+
+            const tx = await signer.signTransaction(transaction)
+
+            const { transactionHash } = await client.eth.sendSignedTransaction(tx.rawTransaction as string)
+
+            return transactionHash
+        } catch (error) {
+            throw new Error(error as unknown as string)
         }
     }
 }
