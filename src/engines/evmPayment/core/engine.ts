@@ -1,14 +1,17 @@
 import { CHAIN_DATA } from "@wallet/constants";
-import { PaymentContext, PaymentConfig, SetWhiteListTokenParams, IsWhiteListTokenParams, PayParams } from "../types";
+import { PaymentAbstract } from "../../../abstract";
+import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams } from "../../../types";
+import { PaymentContext } from "../types";
 import { CoreChain } from "./coreChain";
 
-export class Coin98Payment {
-    coreChain: CoreChain
+export class EvmPayment extends PaymentAbstract {
+    _coreChain: CoreChain
     private privateKey: string
 
-    constructor(config: PaymentConfig){
-        this.coreChain = new CoreChain()
-        this.privateKey = config.privateKey
+    constructor(_config: PaymentEngineConfig){
+        super(_config)
+        this.privateKey = _config.privateKey
+        this._coreChain = new CoreChain()
     }
 
     async setWhitelistToken(params: SetWhiteListTokenParams): Promise<string>{
@@ -18,13 +21,13 @@ export class Coin98Payment {
             const addresses = paramsWhiteList.map(item => item.address)
             const isActives = paramsWhiteList.map(item => item.isActive)
 
-            const { contract, address }: { address: string; contract: PaymentContext } = this.coreChain.getContract(chain)
+            const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
             const data = contract.methods.setWhitelistTokens(addresses, isActives).encodeABI()
 
             const chainData = CHAIN_DATA[chain]
 
-            const client = this.coreChain.getProvider(chain)
-            const signer = client.eth.accounts.privateKeyToAccount(this.privateKey)
+            const client = this._coreChain.getProvider(chain)
+            const signer = client.eth.accounts.privateKeyToAccount(this.privateKey as string)
             const nonce = await client.eth.getTransactionCount(signer.address)
 
             const transaction = {
@@ -54,7 +57,7 @@ export class Coin98Payment {
     async isWhitelistToken(params: IsWhiteListTokenParams): Promise<boolean> {
         const {tokenAddress, chain} = params
         try {
-            const { contract }: { address: string; contract: PaymentContext } = this.coreChain.getContract(chain)
+            const { contract }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
             const isWhiteList = await contract.methods.isWhiteListToken(tokenAddress).call()
 
             return isWhiteList as boolean
@@ -66,12 +69,13 @@ export class Coin98Payment {
     async pay(params: PayParams): Promise<string>{
         const { tokenAddress, amount, receiver, data: dataHex, chain } = params
         try {
-            const { contract, address }: { address: string; contract: PaymentContext } = this.coreChain.getContract(chain)
+            const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
             const data = contract.methods.pay(tokenAddress, amount, receiver, dataHex).encodeABI()
+            console.log("🚀 ~ EvmPayment ~ pay ~ data:", data)
 
             const chainData = CHAIN_DATA[chain]
 
-            const client = this.coreChain.getProvider(chain)
+            const client = this._coreChain.getProvider(chain)
             const signer = client.eth.accounts.privateKeyToAccount(this.privateKey)
             const nonce = await client.eth.getTransactionCount(signer.address)
 
@@ -96,5 +100,12 @@ export class Coin98Payment {
         } catch (error) {
             throw new Error(error as unknown as string)
         }
+    }
+
+    hasChain(chain: string): boolean {
+        return Object.values(CHAIN_DATA)
+            .filter(chain => chain.isWeb3)
+            .map(item => item.chain)
+            .includes(chain)
     }
 }
