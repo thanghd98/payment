@@ -40,7 +40,6 @@ export class EvmPayment extends PaymentAbstract {
                 nonce
             }
 
-
             const gas = await client.eth.estimateGas(transaction)
             //@ts-expect-error
             transaction.gas = gas

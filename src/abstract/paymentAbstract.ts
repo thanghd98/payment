@@ -7,7 +7,6 @@ export abstract class PaymentAbstract{
       this._config = _config
     }
   
-    
     abstract setWhitelistToken(params: SetWhiteListTokenParams): Promise<string>
     abstract isWhitelistToken(params: IsWhiteListTokenParams): Promise<boolean>
     abstract pay(params: PayParams): Promise<string>
