@@ -1,5 +1,6 @@
 import { CHAIN_DATA } from "@wallet/constants";
 import { PaymentAbstract } from "../../../abstract";
+import { ADDRESS_ZERO } from "../../../constants";
 import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams } from "../../../types";
 import { PaymentContext } from "../types";
 import { CoreChain } from "./coreChain";
@@ -71,7 +72,6 @@ export class EvmPayment extends PaymentAbstract {
         try {
             const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
             const data = contract.methods.pay(tokenAddress, amount, receiver, dataHex).encodeABI()
-            console.log("🚀 ~ EvmPayment ~ pay ~ data:", data)
 
             const chainData = CHAIN_DATA[chain]
 
@@ -79,11 +79,13 @@ export class EvmPayment extends PaymentAbstract {
             const signer = client.eth.accounts.privateKeyToAccount(this.privateKey)
             const nonce = await client.eth.getTransactionCount(signer.address)
 
+            const isNativeAddress = !tokenAddress || tokenAddress === ADDRESS_ZERO
+
             const transaction = {
                 chainId: chainData?.numChainId,
                 to: address,
                 from: signer.address,
-                value: "0x",
+                value: isNativeAddress ? amount : "0x",
                 data,
                 nonce
             }
