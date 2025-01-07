@@ -1,4 +1,4 @@
-import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams } from "../types";
+import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams, Transaction } from "../types";
 
 export abstract class PaymentAbstract{  
     _config: PaymentEngineConfig  
@@ -7,8 +7,8 @@ export abstract class PaymentAbstract{
       this._config = _config
     }
   
-    abstract setWhitelistToken(params: SetWhiteListTokenParams): Promise<string>
+    abstract setWhitelistToken(params: SetWhiteListTokenParams): Promise<Transaction>
     abstract isWhitelistToken(params: IsWhiteListTokenParams): Promise<boolean>
-    abstract pay(params: PayParams): Promise<string>
+    abstract pay(params: PayParams): Promise<Transaction>
     abstract hasChain(chain: string): boolean
 }

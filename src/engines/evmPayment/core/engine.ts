@@ -1,21 +1,19 @@
 import { CHAIN_DATA } from "@wallet/constants";
 import { PaymentAbstract } from "../../../abstract";
 import { ADDRESS_ZERO } from "../../../constants";
-import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams } from "../../../types";
+import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams, Transaction } from "../../../types";
 import { PaymentContext } from "../types";
 import { CoreChain } from "./coreChain";
 
 export class EvmPayment extends PaymentAbstract {
     _coreChain: CoreChain
-    private privateKey: string
 
     constructor(_config: PaymentEngineConfig){
         super(_config)
-        this.privateKey = _config.privateKey
         this._coreChain = new CoreChain()
     }
 
-    async setWhitelistToken(params: SetWhiteListTokenParams): Promise<string>{
+    async setWhitelistToken(params: SetWhiteListTokenParams): Promise<Transaction>{
         const { params: paramsWhiteList, chain } = params
 
         try {
@@ -25,30 +23,13 @@ export class EvmPayment extends PaymentAbstract {
             const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
             const data = contract.methods.setWhitelistTokens(addresses, isActives).encodeABI()
 
-            const chainData = CHAIN_DATA[chain]
-
-            const client = this._coreChain.getProvider(chain)
-            const signer = client.eth.accounts.privateKeyToAccount(this.privateKey as string)
-            const nonce = await client.eth.getTransactionCount(signer.address)
-
             const transaction = {
-                chainId: chainData?.numChainId,
                 to: address,
-                from: signer.address,
-                value: "0x",
+                value: '0',
                 data,
-                nonce
             }
 
-            const gas = await client.eth.estimateGas(transaction)
-            //@ts-expect-error
-            transaction.gas = gas
-
-            const tx = await signer.signTransaction(transaction)
-
-            const { transactionHash } = await client.eth.sendSignedTransaction(tx.rawTransaction as string)
-
-            return transactionHash
+            return transaction
         } catch (error) {
             throw new Error(error as unknown as string)
         }
@@ -66,38 +47,29 @@ export class EvmPayment extends PaymentAbstract {
         }
     }
 
-    async pay(params: PayParams): Promise<string>{
+    async pay(params: PayParams): Promise<Transaction>{
         const { tokenAddress, amount, receiver, data: dataHex, chain } = params
         try {
             const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
             const data = contract.methods.pay(tokenAddress, amount, receiver, dataHex).encodeABI()
 
-            const chainData = CHAIN_DATA[chain]
-
-            const client = this._coreChain.getProvider(chain)
-            const signer = client.eth.accounts.privateKeyToAccount(this.privateKey)
-            const nonce = await client.eth.getTransactionCount(signer.address)
-
             const isNativeAddress = !tokenAddress || tokenAddress === ADDRESS_ZERO
 
             const transaction = {
-                chainId: chainData?.numChainId,
                 to: address,
-                from: signer.address,
-                value: isNativeAddress ? amount : "0x",
+                value: isNativeAddress ? amount : '0',
                 data,
-                nonce
             }
 
-            const gas = await client.eth.estimateGas(transaction)
-            //@ts-expect-error
-            transaction.gas = gas
+            // const gas = await client.eth.estimateGas(transaction)
+            // //@ts-expect-error
+            // transaction.gas = gas
 
-            const tx = await signer.signTransaction(transaction)
+            // const tx = await signer.signTransaction(transaction)
 
-            const { transactionHash } = await client.eth.sendSignedTransaction(tx.rawTransaction as string)
+            // const { transactionHash } = await client.eth.sendSignedTransaction(tx.rawTransaction as string)
 
-            return transactionHash
+            return transaction
         } catch (error) {
             throw new Error(error as unknown as string)
         }
