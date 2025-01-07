@@ -31,7 +31,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@coin98/evm_payment",
+  "name": "@coin98/payment",
   "author": "thanghoduc",
   "module": "dist/payment.esm.js",
   "size-limit": [
