@@ -1,4 +1,5 @@
 import { CHAIN_DATA } from "@wallet/constants";
+import { encodeBytes32String } from "ethers";
 import { PaymentAbstract } from "../../../abstract";
 import { ADDRESS_ZERO } from "../../../constants";
 import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams, Transaction } from "../../../types";
@@ -48,10 +49,10 @@ export class EvmPayment extends PaymentAbstract {
     }
 
     async pay(params: PayParams): Promise<Transaction>{
-        const { tokenAddress, amount, receiver, data: dataHex, chain } = params
+        const { tokenAddress, amount, receiver, data: dataHex, transactionId, chain } = params
         try {
             const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
-            const data = contract.methods.pay(tokenAddress, amount, receiver, dataHex).encodeABI()
+            const data = contract.methods.pay(tokenAddress, amount, receiver, encodeBytes32String(transactionId), dataHex).encodeABI()
 
             const isNativeAddress = !tokenAddress || tokenAddress === ADDRESS_ZERO
 

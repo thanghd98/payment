@@ -15,5 +15,5 @@ export interface CallContext {
 export interface PaymentContract {
     setWhitelistTokens(tokens: string[], isActives: boolean[]): EncodeContext
     isWhiteListToken(contractAddress: string): CallContext
-    pay(tokenAddress: string, amount: string, receiver: string, data?: string): EncodeContext
+    pay(tokenAddress: string, amount: string, receiver: string, transactionId: string, data?: string): EncodeContext
 }

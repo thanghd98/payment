@@ -17,6 +17,7 @@ export interface PayParams {
   tokenAddress: string,
   amount: string,
   receiver: string,
+  transactionId: string,
   data?: string,
   chain: chainKey
 }
