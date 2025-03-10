@@ -13,7 +13,7 @@ export interface CallContext {
 }
 
 export interface PaymentContract {
-    setWhitelistTokens(tokens: string[], isActives: boolean[]): EncodeContext
-    isWhiteListToken(contractAddress: string): CallContext
-    pay(tokenAddress: string, amount: string, receiver: string, transactionId: string, data?: string): EncodeContext
+    pay(partnerCode: string, tokenAddress: string, amount: string, payFor: string, data?: string): EncodeContext
+    isWhiteListToken(tokenAddress: string): CallContext
+    getPartnerInfo(partnerCode: string): CallContext
 }

@@ -1,8 +1,7 @@
 import { CHAIN_DATA } from "@wallet/constants";
-import { encodeBytes32String } from "ethers";
 import { PaymentAbstract } from "../../../abstract";
 import { ADDRESS_ZERO } from "../../../constants";
-import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams, Transaction } from "../../../types";
+import { PaymentEngineConfig, PayParams, Transaction } from "../../../types";
 import { PaymentContext } from "../types";
 import { CoreChain } from "./coreChain";
 
@@ -14,45 +13,22 @@ export class EvmPayment extends PaymentAbstract {
         this._coreChain = new CoreChain()
     }
 
-    async setWhitelistToken(params: SetWhiteListTokenParams): Promise<Transaction>{
-        const { params: paramsWhiteList, chain } = params
-
-        try {
-            const addresses = paramsWhiteList.map(item => item.address)
-            const isActives = paramsWhiteList.map(item => item.isActive)
-
-            const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
-            const data = contract.methods.setWhitelistTokens(addresses, isActives).encodeABI()
-
-            const transaction = {
-                to: address,
-                value: '0',
-                data,
-            }
-
-            return transaction
-        } catch (error) {
-            throw new Error(error as unknown as string)
-        }
-    }
-
-    async isWhitelistToken(params: IsWhiteListTokenParams): Promise<boolean> {
-        const {tokenAddress, chain} = params
-        try {
-            const { contract }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
-            const isWhiteList = await contract.methods.isWhiteListToken(tokenAddress).call()
-
-            return isWhiteList as boolean
-        } catch (error) {
-            return false
-        }
-    }
-
     async pay(params: PayParams): Promise<Transaction>{
-        const { tokenAddress, amount, receiver, data: dataHex, transactionId, chain } = params
+        const { tokenAddress, amount, partnerCode, data: dataHex, payFor, chain } = params
         try {
-            const { contract, address }: { address: string; contract: PaymentContext } = this._coreChain.getContract(chain)
-            const data = contract.methods.pay(tokenAddress, amount, receiver, encodeBytes32String(transactionId), dataHex).encodeABI()
+            const { contract, address }: { address: string; contract: PaymentContext } = await this._coreChain.getContract(chain)
+
+            const partnerInfo = await contract.methods.getPartnerInfo(partnerCode).call()
+            console.log("🚀 ~ EvmPayment ~ pay ~ partnerInfo:", partnerInfo)
+            //@ts-expect-error
+            if(!partnerInfo.isActive) throw new Error('Partner not exists')
+            
+            const isWhiteListToken = await contract.methods.isWhiteListToken(tokenAddress).call()
+            console.log("🚀 ~ EvmPayment ~ pay ~ isWhiteListToken:", isWhiteListToken)
+            if(!isWhiteListToken) throw new Error('Token not exists')
+
+            const data = contract.methods.pay(partnerCode, tokenAddress, amount, payFor, dataHex || '0x').encodeABI()
+            console.log("🚀 ~ EvmPayment ~ pay ~ data:", data)
 
             const isNativeAddress = !tokenAddress || tokenAddress === ADDRESS_ZERO
 

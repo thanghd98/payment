@@ -5,11 +5,6 @@ export const PaymentAbi =  [
         "internalType": "address",
         "name": "feeReceiver",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "protocolFee",
-        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
@@ -57,68 +52,6 @@ export const PaymentAbi =  [
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "payerAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "nodeId",
-        "type": "bytes"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "requestId",
-        "type": "bytes"
-      }
-    ],
-    "name": "CardCreated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "depositAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "payerAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "data",
-        "type": "bytes"
-      }
-    ],
-    "name": "Deposit",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -139,6 +72,65 @@ export const PaymentAbi =  [
     "inputs": [
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "isActive",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "protocolFee",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "share",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct Pajily.PaymentInfo[]",
+            "name": "paymentInfos",
+            "type": "tuple[]"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Pajily.PartnerInfo",
+        "name": "partnerInfo",
+        "type": "tuple"
+      }
+    ],
+    "name": "PartnerCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "token",
         "type": "address"
@@ -152,19 +144,13 @@ export const PaymentAbi =  [
       {
         "indexed": false,
         "internalType": "address",
-        "name": "depositAddress",
+        "name": "payer",
         "type": "address"
       },
       {
         "indexed": false,
-        "internalType": "bytes",
-        "name": "transactionId",
-        "type": "bytes"
-      },
-      {
-        "indexed": false,
         "internalType": "address",
-        "name": "payerAddress",
+        "name": "payFor",
         "type": "address"
       },
       {
@@ -174,7 +160,7 @@ export const PaymentAbi =  [
         "type": "bytes"
       }
     ],
-    "name": "Pay",
+    "name": "Payment",
     "type": "event"
   },
   {
@@ -182,30 +168,18 @@ export const PaymentAbi =  [
     "inputs": [
       {
         "indexed": false,
-        "internalType": "bytes[]",
-        "name": "cardTypes",
-        "type": "bytes[]"
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
       },
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "fee",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "isActive",
-            "type": "bool"
-          }
-        ],
         "indexed": false,
-        "internalType": "struct MultiPayment.Card[]",
-        "name": "cards",
-        "type": "tuple[]"
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
       }
     ],
-    "name": "SetCardsType",
+    "name": "SetStatusPartner",
     "type": "event"
   },
   {
@@ -232,32 +206,6 @@ export const PaymentAbi =  [
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "newCreateCardFee",
-        "type": "uint256"
-      }
-    ],
-    "name": "UpdateCreateCardFee",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newDepositFee",
-        "type": "uint256"
-      }
-    ],
-    "name": "UpdateDepositFee",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "newFeeReceiver",
         "type": "address"
@@ -271,51 +219,69 @@ export const PaymentAbi =  [
     "inputs": [
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "UpdatePartnerOwner",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "share",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Pajily.PaymentInfo[]",
+        "name": "paymentInfos",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "UpdatePartnerPaymentInfo",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "newProtocolFee",
         "type": "uint256"
       }
     ],
-    "name": "UpdateProtocolFee",
+    "name": "UpdatePartnerProtocolFee",
     "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "_listTokens",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "_whitelistTokens",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [],
@@ -327,42 +293,53 @@ export const PaymentAbi =  [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
       },
       {
-        "internalType": "bytes",
-        "name": "cardType",
-        "type": "bytes"
-      },
-      {
-        "internalType": "bytes",
-        "name": "nodeId",
-        "type": "bytes"
-      },
-      {
-        "internalType": "bytes",
-        "name": "requestId",
-        "type": "bytes"
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "isActive",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "protocolFee",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "share",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct Pajily.PaymentInfo[]",
+            "name": "paymentInfos",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct Pajily.PartnerInfo",
+        "name": "info",
+        "type": "tuple"
       }
     ],
-    "name": "createCard",
+    "name": "createPartner",
     "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getDepositFee",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -373,6 +350,59 @@ export const PaymentAbi =  [
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      }
+    ],
+    "name": "getPartnerInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "isActive",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "protocolFee",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "share",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct Pajily.PaymentInfo[]",
+            "name": "paymentInfos",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct Pajily.PartnerInfo",
+        "name": "",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -432,6 +462,11 @@ export const PaymentAbi =  [
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
         "internalType": "address",
         "name": "token",
         "type": "address"
@@ -443,13 +478,8 @@ export const PaymentAbi =  [
       },
       {
         "internalType": "address",
-        "name": "receiverAddress",
+        "name": "payFor",
         "type": "address"
-      },
-      {
-        "internalType": "bytes",
-        "name": "transactionId",
-        "type": "bytes"
       },
       {
         "internalType": "bytes",
@@ -483,36 +513,6 @@ export const PaymentAbi =  [
   {
     "inputs": [
       {
-        "internalType": "bytes[]",
-        "name": "cardTypes",
-        "type": "bytes[]"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "fee",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "isActive",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct MultiPayment.Card[]",
-        "name": "cards",
-        "type": "tuple[]"
-      }
-    ],
-    "name": "setCardsType",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address[]",
         "name": "tokens",
         "type": "address[]"
@@ -529,19 +529,6 @@ export const PaymentAbi =  [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "tokenList",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -550,19 +537,6 @@ export const PaymentAbi =  [
       }
     ],
     "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "newDepositFee",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateDepositFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -583,12 +557,83 @@ export const PaymentAbi =  [
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "updatePartnerOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "share",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Pajily.PaymentInfo[]",
+        "name": "paymentInfos",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "updatePartnerPaymentInfo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
         "name": "newProtocolFee",
         "type": "uint256"
       }
     ],
-    "name": "updateProtocolFee",
+    "name": "updatePartnerProtocolFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "partnerCode",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
+      }
+    ],
+    "name": "updatePartnerStatus",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

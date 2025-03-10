@@ -1,5 +1,5 @@
 import { PaymentAbstract } from "../abstract";
-import { IsWhiteListTokenParams, PaymentEngineConfig, PayParams, SetWhiteListTokenParams, Transaction } from "../types";
+import { PaymentEngineConfig, PayParams, Transaction } from "../types";
 
 export class Coin98PaymentFactory {
     engines: PaymentAbstract[]
@@ -19,40 +19,9 @@ export class Coin98PaymentFactory {
         return engine
     }
 
-    async setWhitelistToken(params: SetWhiteListTokenParams): Promise<Transaction>{
-        const {chain} = params
-        const engine = this.getPaymentByChain(chain)
-
-        if(engine){
-            try {
-                return engine.setWhitelistToken(params)
-            } catch (error) {
-                throw new Error('Method not implement')
-            }
-        }
-
-        throw new Error('Method not implement')
-    }
-
-    async isWhitelistToken(params: IsWhiteListTokenParams): Promise<boolean>{
-        const {chain} = params
-        const engine = this.getPaymentByChain(chain)
-
-        if(engine){
-            try {
-                return engine.isWhitelistToken(params)
-            } catch (error) {
-                return false
-            }
-        }
-
-        throw new Error('Method not implement')
-    }
-
     async pay(params: PayParams): Promise<Transaction>{
         const {chain} = params
         const engine = this.getPaymentByChain(chain)
-        console.log("🚀 ~ Coin98PaymentFactory ~ pay ~ engine:", engine)
 
         if(engine){
             try {
